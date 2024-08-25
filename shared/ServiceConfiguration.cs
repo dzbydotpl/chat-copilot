@@ -90,7 +90,7 @@ internal sealed class ServiceConfiguration
         // - config.DataIngestion.EmbeddingGeneratorTypes => list of generators, embeddings to generate and store in memory DB
         // - config.Retrieval.EmbeddingGeneratorType      => one embedding generator, used to search, and usually injected into Memory DB constructor
 
-        this.ConfigureIngestionEmbeddingGenerators(builder);
+        //this.ConfigureIngestionEmbeddingGenerators(builder);
 
         this.ConfigureSearchClient(builder);
 

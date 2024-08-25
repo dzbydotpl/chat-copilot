@@ -53,9 +53,11 @@ public sealed class SemanticKernelProvider
 
             case string x when x.Equals("OpenAI", StringComparison.OrdinalIgnoreCase):
                 var openAIOptions = memoryOptions.GetServiceConfig<OpenAIConfig>(configuration, "OpenAI");
+                #pragma warning disable SKEXP0010
                 builder.AddOpenAIChatCompletion(
-                    openAIOptions.TextModel,
-                    openAIOptions.APIKey,
+                    modelId: openAIOptions.TextModel,
+                    apiKey: null,
+                    endpoint: new Uri("http://localhost:11434/"),
                     httpClient: httpClientFactory.CreateClient());
 #pragma warning restore CA2000
                 break;
