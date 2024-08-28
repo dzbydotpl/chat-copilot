@@ -1,15 +1,21 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.KernelMemory;
 using Microsoft.KernelMemory.AI;
+using Microsoft.KernelMemory.AI.AzureOpenAI;
+using Microsoft.KernelMemory.AI.LlamaSharp;
+using Microsoft.KernelMemory.AI.OpenAI;
 using Microsoft.KernelMemory.DocumentStorage.DevTools;
 using Microsoft.KernelMemory.MemoryStorage;
 using Microsoft.KernelMemory.MemoryStorage.DevTools;
 using Microsoft.KernelMemory.Pipeline.Queue.DevTools;
+using Microsoft.SemanticKernel;
 
 namespace CopilotChat.Shared;
 
@@ -215,7 +221,19 @@ internal sealed class ServiceConfiguration
                 }
 
                 default:
-                    // NOOP - allow custom implementations, via WithCustomEmbeddingGeneration()
+                    //NOOP - allow custom implementations, via WithCustomEmbeddingGeneration()
+                    var custom = this.GetServiceInstance<ITextEmbeddingGenerator>(builder,
+                        s =>
+                        {
+                            s.AddSingleton<ITextEmbeddingGenerator>(s =>
+                            {
+
+                                return new LlamaSharpEmbeddingGenerator(new GPT4Tokenizer(), s.GetService<ILoggerFactory>());
+                            });
+                        });
+
+
+                    builder.AddIngestionEmbeddingGenerator(custom);
                     break;
             }
         }
@@ -316,6 +334,21 @@ internal sealed class ServiceConfiguration
 
             default:
                 // NOOP - allow custom implementations, via WithCustomEmbeddingGeneration()
+
+
+
+                var instance = this.GetServiceInstance<ITextEmbeddingGenerator>(builder,
+                    s =>
+                    {
+                        s.AddSingleton<ITextEmbeddingGenerator>(s =>
+                        {
+
+                            return new LlamaSharpEmbeddingGenerator(new GPT4Tokenizer(), s.GetService<ILoggerFactory>());
+                        });
+                    });
+
+
+                builder.Services.AddSingleton<ITextEmbeddingGenerator>(instance);
                 break;
         }
     }
@@ -371,6 +404,13 @@ internal sealed class ServiceConfiguration
 
             default:
                 // NOOP - allow custom implementations, via WithCustomTextGeneration()
+#pragma warning disable KMEXP01 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+                builder.Services
+                .AddSingleton<ITextGenerator>(serviceProvider => new OllamaTextGenerator(
+                    textTokenizer: new GPT4Tokenizer(),
+                    httpClient: serviceProvider.GetService<IHttpClientFactory>().CreateClient(),
+                    loggerFactory: serviceProvider.GetService<ILoggerFactory>()));
+#pragma warning restore KMEXP01 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
                 break;
         }
     }

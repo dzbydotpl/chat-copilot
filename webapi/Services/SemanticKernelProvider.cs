@@ -61,7 +61,15 @@ public sealed class SemanticKernelProvider
                 break;
 
             default:
-                throw new ArgumentException($"Invalid {nameof(memoryOptions.TextGeneratorType)} value in 'KernelMemory' settings.");
+                //var openAIOptions = memoryOptions.GetServiceConfig<OpenAIConfig>(configuration, "OpenAI");
+#pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+                builder.AddOpenAIChatCompletion(
+                    modelId: "llama",
+                    apiKey: null,
+                    endpoint: new Uri("http://localhost:11435/"),
+                    httpClient: httpClientFactory.CreateClient());
+#pragma warning restore SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+                break;
         }
 
         return builder.Build();
