@@ -55,9 +55,9 @@ public sealed class SemanticKernelProvider
                 var openAIOptions = memoryOptions.GetServiceConfig<OpenAIConfig>(configuration, "OpenAI");
                 #pragma warning disable SKEXP0010
                 builder.AddOpenAIChatCompletion(
-                    modelId: openAIOptions.TextModel,
+                    modelId: "llama",
                     apiKey: null,
-                    endpoint: new Uri("http://localhost:11434/"),
+                    endpoint: new Uri("http://localhost:11435/"),
                     httpClient: httpClientFactory.CreateClient());
 #pragma warning restore CA2000
                 break;
