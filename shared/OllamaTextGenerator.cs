@@ -61,11 +61,11 @@ public sealed class OllamaTextGenerator : ITextGenerator
             options.Transport = new HttpClientTransport(httpClient);
         }
 
-        this._client = new OllamaTextGenerationService("llama", "http://localhost:11435", httpClient, loggerFactory);
+        this._client = new OllamaTextGenerationService("llama3.1:8b", "http://localhost:11434", httpClient, loggerFactory);
     }
 
     /// <inheritdoc/>
-    public int MaxTokenTotal { get; }
+    public int MaxTokenTotal { get; } = 4096;
 
     /// <inheritdoc/>
     public int CountTokens(string text)

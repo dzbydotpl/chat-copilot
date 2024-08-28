@@ -29,7 +29,7 @@ public class OllamaTextGenerationService(string modelId, string baseUrl, HttpCli
             options = executionSettings?.ExtensionData,
         };
 
-        var response = await Http.PostAsJsonAsync($"{Attributes["base_url"]}/v1/chat/completions", data, cancellationToken).ConfigureAwait(false);
+        var response = await Http.PostAsJsonAsync($"{Attributes["base_url"]}/v1/generate", data, cancellationToken).ConfigureAwait(false);
 
         ValidateOllamaResponse(response);
 

@@ -59,7 +59,7 @@ public class LlamaSharpEmbeddingGenerator : ITextEmbeddingGenerator, ITextEmbedd
        
 
 
-        this._client = new OllamaTextEmbeddingGeneration("gemma2", "http://localhost:11435/", new HttpClient(), loggerFactory);
+        this._client = new OllamaTextEmbeddingGeneration("gemma2:latest", "http://localhost:11434", new HttpClient(), loggerFactory);
     }
 
     /// <inheritdoc/>

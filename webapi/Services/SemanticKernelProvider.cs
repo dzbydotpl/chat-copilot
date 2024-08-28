@@ -2,11 +2,18 @@
 
 using System;
 using System.Net.Http;
+using Codeblaze.SemanticKernel.Connectors.Ollama;
+using CopilotChat.Shared;
+using Elastic.Transport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Microsoft.SemanticKernel.TextGeneration;
 
 namespace CopilotChat.WebApi.Services;
 
@@ -62,13 +69,15 @@ public sealed class SemanticKernelProvider
 
             default:
                 //var openAIOptions = memoryOptions.GetServiceConfig<OpenAIConfig>(configuration, "OpenAI");
-#pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-                builder.AddOpenAIChatCompletion(
-                    modelId: "llama",
-                    apiKey: null,
-                    endpoint: new Uri("http://localhost:11435/"),
-                    httpClient: httpClientFactory.CreateClient());
-#pragma warning restore SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
+                Func<IServiceProvider, object?, OllamaChatCompletionService> factory = (serviceProvider, _) =>
+            new(modelId: "llama3.1:8b",
+                baseUrl: "http://localhost:11434",
+                http: httpClientFactory.CreateClient(),
+                loggerFactory: serviceProvider.GetService<ILoggerFactory>());
+
+                builder.Services.AddKeyedSingleton<IChatCompletionService>(null, factory);
+                //builder.Services.AddKeyedSingleton<ITextGenerationService>(null, (Func<IServiceProvider, object, ITextGenerationService>)factory);
                 break;
         }
 
